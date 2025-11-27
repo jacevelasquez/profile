@@ -1,3 +1,5 @@
+const BASE_URL = import.meta.env.BASE_URL
+
 function Introduction() {
   return (
     <section 
@@ -7,7 +9,7 @@ function Introduction() {
       {/* Background with overlay */}
       <div 
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: "url('/bg-intro.jpg')" }}
+        style={{ backgroundImage: `url('${BASE_URL}bg-intro.jpg')` }}
       />
       <div className="absolute inset-0 bg-gradient-to-br from-slate-900/90 via-slate-900/70 to-indigo-900/80" />
       
@@ -31,7 +33,7 @@ function Introduction() {
             React, Node.js, Python. I architect, ship, and automate.
           </p>
           <a 
-            href="/cv.pdf" 
+            href={`${BASE_URL}cv.pdf`} 
             download
             className="btn-glow inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-xl"
           >
@@ -50,7 +52,7 @@ function Introduction() {
             <div className="absolute -inset-4 rounded-full border-2 border-indigo-500/30 animate-float" />
             <div className="absolute -inset-8 rounded-full border border-purple-500/20" style={{ animationDelay: '1s' }} />
             <img 
-              src="/avatar.png" 
+              src={`${BASE_URL}avatar.png`} 
               alt="JC Velasquez" 
               className="w-80 h-80 rounded-full object-cover relative z-10 border-4 border-white/10"
             />
