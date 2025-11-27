@@ -1,5 +1,7 @@
 import { projects } from '../data/projects'
 
+const BASE_URL = import.meta.env.BASE_URL
+
 function Projects() {
   return (
     <section id="projects" className="min-h-screen p-8 bg-slate-900">
@@ -18,9 +20,9 @@ function Projects() {
             >
               {project.icon ? (
                 <img 
-                  src={project.icon} 
+                  src={BASE_URL+project.icon} 
                   alt={project.title} 
-                  className="w-64 h-100 mx-auto mb-4 rounded-lg object-cover"
+                  className="w-64 h-64 mx-auto mb-4 rounded-lg object-contain"
                 />
               ) : (
                 <div className="w-32 h-32 mx-auto mb-4 rounded-lg border-2 border-dashed border-gray-500 flex items-center justify-center">
@@ -28,6 +30,7 @@ function Projects() {
                 </div>
               )}
               <h3 className="text-xl font-bold">{project.title}</h3>
+              <span className="text-sm">{project.desc}</span>
             </a>
           ))}
         </div>
