@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { Link } from 'react-router-dom'
+import { ArrowLeftIcon } from '@heroicons/react/24/solid'
 import { Pokemon, PokemonListResponse, TypeResponse } from '../../types/pokemon'
 import { API_BASE, POKEMON_PER_PAGE, ALL_TYPES } from '../../constants/pokemon'
 import PokemonCard from '../pokemon/PokemonCard'
@@ -230,7 +231,7 @@ function PokemonDatabase() {
               to="/#projects"
               className="inline-flex items-center text-cyan-400 hover:text-cyan-300 transition-colors"
             >
-              Back
+              <ArrowLeftIcon className="w-10 h-10" />
             </Link>
             <div className="flex items-center gap-3">
               <img
@@ -243,15 +244,15 @@ function PokemonDatabase() {
             <div className="w-16" />
           </div>
 
-          <div className="flex gap-2 overflow-x-auto pb-2">
+          <div className="inline-flex gap-2 overflow-x-auto pb-2 rounded-xl bg-slate-800 p-2">
             {TABS.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all whitespace-nowrap ${
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium whitespace-nowrap ${
                   activeTab === tab.id
                     ? 'bg-cyan-600 text-white'
-                    : 'bg-slate-800 text-gray-400 hover:bg-slate-700 hover:text-white'
+                    : 'text-gray-400 hover:bg-slate-700 hover:text-white'
                 }`}
               >
                 <span>{tab.label}</span>
@@ -306,7 +307,7 @@ function PokemonDatabase() {
 
             {loading ? (
               <div className="flex flex-col items-center justify-center py-20">
-                <div className="w-16 h-16 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin mb-4" />
+                <div className="w-16 h-16 border-4 border-cyan-500 border-t-transparent rounded animate-spin mb-4" />
                 <p className="text-gray-400">Loading Pokémon...</p>
               </div>
             ) : filteredList.length === 0 ? (
@@ -336,7 +337,7 @@ function PokemonDatabase() {
                     >
                       {loadingMore ? (
                         <>
-                          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded animate-spin" />
                           Loading...
                         </>
                       ) : (

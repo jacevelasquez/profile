@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
+import { ArrowLeftIcon } from '@heroicons/react/24/solid'
 import { Move, MoveListResponse, TypeResponse, DamageClassResponse } from '../../types/pokemon'
 import { API_BASE, MOVES_PER_PAGE, TYPE_COLORS, ALL_TYPES, MOVE_CATEGORIES } from '../../constants/pokemon'
 import { getMoveCategoryColor, formatName } from '../../utils/pokemon'
@@ -18,8 +19,9 @@ function MovesList() {
   const [totalCount, setTotalCount] = useState(0)
   const [filterCount, setFilterCount] = useState(0)
   const [selectedMove, setSelectedMove] = useState<Move | null>(null)
-  const allMoveUrls = useRef<string[]>([])
+  const allMovesList = useRef<{ name: string; url: string }[]>([])
   const filteredMoveUrls = useRef<string[]>([])
+  const baseFilteredMoves = useRef<Move[]>([])
 
   const fetchMoves = useCallback(async (newOffset: number, append: boolean = false) => {
     try {
@@ -32,12 +34,12 @@ function MovesList() {
       if (!append) {
         const listRes = await fetch(`${API_BASE}/move?limit=1000`)
         const listData: MoveListResponse = await listRes.json()
-        allMoveUrls.current = listData.results.map(m => m.url)
+        allMovesList.current = listData.results
         setTotalCount(listData.count)
       }
 
-      const urlsToFetch = allMoveUrls.current.slice(newOffset, newOffset + MOVES_PER_PAGE)
-      setHasMore(newOffset + MOVES_PER_PAGE < allMoveUrls.current.length)
+      const urlsToFetch = allMovesList.current.slice(newOffset, newOffset + MOVES_PER_PAGE).map(m => m.url)
+      setHasMore(newOffset + MOVES_PER_PAGE < allMovesList.current.length)
 
       const detailPromises = urlsToFetch.map((url) =>
         fetch(url).then((res) => res.json())
@@ -54,6 +56,34 @@ function MovesList() {
     } finally {
       setLoading(false)
       setLoadingMore(false)
+    }
+  }, [])
+
+  const fetchMovesBySearch = useCallback(async (term: string) => {
+    try {
+      setLoading(true)
+      const searchTerm = term.toLowerCase().replace(/\s+/g, '-')
+      const matchingMoves = allMovesList.current.filter(m => 
+        m.name.toLowerCase().includes(searchTerm)
+      )
+      
+      if (matchingMoves.length === 0) {
+        setFilteredMoves([])
+        setLoading(false)
+        return
+      }
+
+      // Limit to first 50 matches to avoid too many requests
+      const urlsToFetch = matchingMoves.slice(0, 50).map(m => m.url)
+      const detailPromises = urlsToFetch.map((url) =>
+        fetch(url).then((res) => res.json())
+      )
+      const details: Move[] = await Promise.all(detailPromises)
+      setFilteredMoves(details)
+    } catch (error) {
+      console.error('Error searching moves:', error)
+    } finally {
+      setLoading(false)
     }
   }, [])
 
@@ -103,8 +133,10 @@ function MovesList() {
       const details: Move[] = await Promise.all(detailPromises)
 
       if (append) {
-        setFilteredMoves((prev) => [...prev, ...details])
+        baseFilteredMoves.current = [...baseFilteredMoves.current, ...details]
+        setFilteredMoves(baseFilteredMoves.current)
       } else {
+        baseFilteredMoves.current = details
         setFilteredMoves(details)
       }
     } catch (error) {
@@ -125,6 +157,7 @@ function MovesList() {
       fetchMovesByFilter(selectedType, selectedCategory, 0)
     } else {
       filteredMoveUrls.current = []
+      baseFilteredMoves.current = []
       setFilteredMoves(moves)
       setFilterCount(0)
     }
@@ -133,21 +166,24 @@ function MovesList() {
   useEffect(() => {
     if (!selectedType && !selectedCategory) {
       if (searchTerm) {
-        const term = searchTerm.toLowerCase()
-        const filtered = moves.filter((m) =>
-          m.name.toLowerCase().includes(term.replace(/\s+/g, '-'))
-        )
-        setFilteredMoves(filtered)
+        // Debounce search to avoid too many API calls
+        const timeoutId = setTimeout(() => {
+          fetchMovesBySearch(searchTerm)
+        }, 300)
+        return () => clearTimeout(timeoutId)
       } else {
         setFilteredMoves(moves)
       }
     } else if (searchTerm) {
       const term = searchTerm.toLowerCase()
-      setFilteredMoves(prev => prev.filter((m) =>
+      const filtered = baseFilteredMoves.current.filter((m) =>
         m.name.toLowerCase().includes(term.replace(/\s+/g, '-'))
-      ))
+      )
+      setFilteredMoves(filtered)
+    } else {
+      setFilteredMoves(baseFilteredMoves.current)
     }
-  }, [moves, searchTerm, selectedType, selectedCategory])
+  }, [moves, searchTerm, selectedType, selectedCategory, fetchMovesBySearch])
 
   const loadMore = () => {
     if (selectedType || selectedCategory) {
@@ -167,6 +203,7 @@ function MovesList() {
     setSelectedCategory('')
     setFilterOffset(0)
     filteredMoveUrls.current = []
+    baseFilteredMoves.current = []
     setFilteredMoves(moves)
   }
 
@@ -303,52 +340,50 @@ function MovesList() {
           onClick={() => setSelectedMove(null)}
         >
           <div
-            className="bg-slate-900 rounded-2xl max-w-md w-full p-6 shadow-2xl"
+            className="bg-slate-900 rounded-2xl max-w-3xl w-full p-6 shadow-2xl relative"
             onClick={(e) => e.stopPropagation()}
           >
-            <button
-              onClick={() => setSelectedMove(null)}
-              className="absolute top-4 right-4 w-8 h-8 rounded bg-slate-800 text-white flex items-center justify-center hover:bg-slate-700 transition-colors"
-            >
-              ✕
-            </button>
-
-            <h2 className="text-2xl font-bold text-white capitalize mb-2">
-              {formatName(selectedMove.name)}
-            </h2>
-
-            <div className="flex items-center gap-2 mb-4">
-              <span
-                className="px-3 py-1 rounded text-sm font-semibold text-white capitalize"
-                style={{ backgroundColor: TYPE_COLORS[selectedMove.type.name] || '#666' }}
+            <div className="flex items-center gap-3 mb-4">
+              <button
+                onClick={() => setSelectedMove(null)}
+                className="w-8 h-8 rounded bg-slate-800 text-white flex items-center justify-center hover:bg-slate-700 transition-colors"
               >
-                {selectedMove.type.name}
-              </span>
+                <ArrowLeftIcon className="w-5 h-5" />
+              </button>
+              <h2 className="text-2xl font-bold text-white capitalize">
+                {formatName(selectedMove.name)}
+              </h2>
             </div>
 
-            <div className="grid grid-cols-3 gap-4 mb-6">
-              <div className="bg-slate-800 rounded-lg p-3 text-center">
-                <p className="text-gray-400 text-xs mb-1">Power</p>
-                <p className="text-white text-xl font-bold">{selectedMove.power ?? '—'}</p>
-              </div>
-              <div className="bg-slate-800 rounded-lg p-3 text-center">
-                <p className="text-gray-400 text-xs mb-1">Accuracy</p>
-                <p className="text-white text-xl font-bold">{selectedMove.accuracy ? `${selectedMove.accuracy}%` : '—'}</p>
-              </div>
-              <div className="bg-slate-800 rounded-lg p-3 text-center">
-                <p className="text-gray-400 text-xs mb-1">PP</p>
-                <p className="text-white text-xl font-bold">{selectedMove.pp ?? '—'}</p>
-              </div>
-            </div>
-
-            {selectedMove.effect_entries.length > 0 && (
+            {selectedMove.learned_by_pokemon && selectedMove.learned_by_pokemon.length > 0 && (
               <div>
-                <h3 className="text-sm font-semibold text-gray-400 mb-2">Effect</h3>
-                <p className="text-gray-300 text-sm leading-relaxed">
-                  {selectedMove.effect_entries.find(e => e.short_effect)?.short_effect || 
-                   selectedMove.effect_entries[0]?.effect || 
-                   'No description available.'}
-                </p>
+                <h3 className="text-sm font-semibold text-gray-400 mb-2">
+                  Learned by {selectedMove.learned_by_pokemon.length} Pokémon
+                </h3>
+                <div className="max-h-[500px] overflow-y-auto bg-slate-800 rounded-lg p-2">
+                  <div className="grid grid-cols-4 gap-2">
+                    {selectedMove.learned_by_pokemon.map((pokemon) => {
+                      const pokemonId = pokemon.url.split('/').filter(Boolean).pop()
+                      return (
+                        <div
+                          key={pokemon.name}
+                          className="flex flex-col items-center p-1 hover:bg-slate-700 rounded"
+                          title={formatName(pokemon.name)}
+                        >
+                          <img
+                            src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemonId}.png`}
+                            alt={pokemon.name}
+                            className="w-15 h-15 object-contain"
+                            loading="lazy"
+                          />
+                          <span className="text-xs text-gray-400 capitalize truncate w-full text-center">
+                            {formatName(pokemon.name)}
+                          </span>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
               </div>
             )}
           </div>

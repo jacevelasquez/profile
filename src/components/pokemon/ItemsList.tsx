@@ -17,8 +17,9 @@ function ItemsList() {
   const [totalCount, setTotalCount] = useState(0)
   const [categoryCount, setCategoryCount] = useState(0)
   const [selectedItem, setSelectedItem] = useState<Item | null>(null)
-  const allItemUrls = useRef<string[]>([])
+  const allItemsList = useRef<{ name: string; url: string }[]>([])
   const categoryItemUrls = useRef<string[]>([])
+  const baseCategoryItems = useRef<Item[]>([])
 
   const fetchItems = useCallback(async (newOffset: number, append: boolean = false) => {
     try {
@@ -31,12 +32,12 @@ function ItemsList() {
       if (!append) {
         const listRes = await fetch(`${API_BASE}/item?limit=2000`)
         const listData: ItemListResponse = await listRes.json()
-        allItemUrls.current = listData.results.map(i => i.url)
+        allItemsList.current = listData.results
         setTotalCount(listData.count)
       }
 
-      const urlsToFetch = allItemUrls.current.slice(newOffset, newOffset + ITEMS_PER_PAGE)
-      setHasMore(newOffset + ITEMS_PER_PAGE < allItemUrls.current.length)
+      const urlsToFetch = allItemsList.current.slice(newOffset, newOffset + ITEMS_PER_PAGE).map(i => i.url)
+      setHasMore(newOffset + ITEMS_PER_PAGE < allItemsList.current.length)
 
       const detailPromises = urlsToFetch.map((url) =>
         fetch(url).then((res) => res.json())
@@ -53,6 +54,34 @@ function ItemsList() {
     } finally {
       setLoading(false)
       setLoadingMore(false)
+    }
+  }, [])
+
+  const fetchItemsBySearch = useCallback(async (term: string) => {
+    try {
+      setLoading(true)
+      const searchTerm = term.toLowerCase().replace(/\s+/g, '-')
+      const matchingItems = allItemsList.current.filter(i => 
+        i.name.toLowerCase().includes(searchTerm)
+      )
+      
+      if (matchingItems.length === 0) {
+        setFilteredItems([])
+        setLoading(false)
+        return
+      }
+
+      // Limit to first 50 matches to avoid too many requests
+      const urlsToFetch = matchingItems.slice(0, 50).map(i => i.url)
+      const detailPromises = urlsToFetch.map((url) =>
+        fetch(url).then((res) => res.json())
+      )
+      const details: Item[] = await Promise.all(detailPromises)
+      setFilteredItems(details)
+    } catch (error) {
+      console.error('Error searching items:', error)
+    } finally {
+      setLoading(false)
     }
   }, [])
 
@@ -80,8 +109,10 @@ function ItemsList() {
       const details: Item[] = await Promise.all(detailPromises)
 
       if (append) {
-        setFilteredItems((prev) => [...prev, ...details])
+        baseCategoryItems.current = [...baseCategoryItems.current, ...details]
+        setFilteredItems(baseCategoryItems.current)
       } else {
+        baseCategoryItems.current = details
         setFilteredItems(details)
       }
     } catch (error) {
@@ -102,6 +133,7 @@ function ItemsList() {
       fetchItemsByCategory(selectedCategory, 0)
     } else {
       categoryItemUrls.current = []
+      baseCategoryItems.current = []
       setFilteredItems(items)
       setCategoryCount(0)
     }
@@ -110,21 +142,24 @@ function ItemsList() {
   useEffect(() => {
     if (!selectedCategory) {
       if (searchTerm) {
-        const term = searchTerm.toLowerCase()
-        const filtered = items.filter((i) =>
-          i.name.toLowerCase().includes(term.replace(/\s+/g, '-'))
-        )
-        setFilteredItems(filtered)
+        // Debounce search to avoid too many API calls
+        const timeoutId = setTimeout(() => {
+          fetchItemsBySearch(searchTerm)
+        }, 300)
+        return () => clearTimeout(timeoutId)
       } else {
         setFilteredItems(items)
       }
     } else if (searchTerm) {
       const term = searchTerm.toLowerCase()
-      setFilteredItems(prev => prev.filter((i) =>
+      const filtered = baseCategoryItems.current.filter((i) =>
         i.name.toLowerCase().includes(term.replace(/\s+/g, '-'))
-      ))
+      )
+      setFilteredItems(filtered)
+    } else {
+      setFilteredItems(baseCategoryItems.current)
     }
-  }, [items, searchTerm, selectedCategory])
+  }, [items, searchTerm, selectedCategory, fetchItemsBySearch])
 
   const loadMore = () => {
     if (selectedCategory) {
@@ -143,6 +178,7 @@ function ItemsList() {
     setSelectedCategory('')
     setCategoryOffset(0)
     categoryItemUrls.current = []
+    baseCategoryItems.current = []
     setFilteredItems(items)
   }
 
@@ -193,7 +229,7 @@ function ItemsList() {
 
       {loading ? (
         <div className="flex flex-col items-center justify-center py-20">
-          <div className="w-16 h-16 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin mb-4" />
+          <div className="w-16 h-16 border-4 border-cyan-500 border-t-transparent rounded animate-spin mb-4" />
           <p className="text-gray-400">Loading items...</p>
         </div>
       ) : filteredItems.length === 0 ? (
@@ -251,7 +287,7 @@ function ItemsList() {
               >
                 {loadingMore ? (
                   <>
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded animate-spin" />
                     Loading...
                   </>
                 ) : (
@@ -263,69 +299,7 @@ function ItemsList() {
         </>
       )}
 
-      {selectedItem && (
-        <div
-          className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-          onClick={() => setSelectedItem(null)}
-        >
-          <div
-            className="bg-slate-900 rounded-2xl max-w-md w-full p-6 shadow-2xl relative"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              onClick={() => setSelectedItem(null)}
-              className="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-white flex items-center justify-center hover:bg-slate-700 transition-colors"
-            >
-              ✕
-            </button>
-
-            <div className="flex items-start gap-4 mb-6">
-              <div className="w-20 h-20 bg-slate-800 rounded-xl flex items-center justify-center flex-shrink-0">
-                {selectedItem.sprites.default ? (
-                  <img
-                    src={selectedItem.sprites.default}
-                    alt={selectedItem.name}
-                    className="w-16 h-16 object-contain"
-                  />
-                ) : (
-                  <span className="text-4xl">📦</span>
-                )}
-              </div>
-              <div>
-                <h2 className="text-xl font-bold text-white capitalize mb-1">
-                  {formatName(selectedItem.name)}
-                </h2>
-                <p className="text-gray-400 text-sm capitalize">
-                  {formatName(selectedItem.category.name)}
-                </p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4 mb-6">
-              <div className="bg-slate-800 rounded-lg p-3">
-                <p className="text-gray-400 text-xs mb-1">Price</p>
-              </div>
-              {selectedItem.fling_power && (
-                <div className="bg-slate-800 rounded-lg p-3">
-                  <p className="text-gray-400 text-xs mb-1">Fling Power</p>
-                  <p className="text-white font-bold">{selectedItem.fling_power}</p>
-                </div>
-              )}
-            </div>
-
-            {selectedItem.effect_entries.length > 0 && (
-              <div>
-                <h3 className="text-sm font-semibold text-gray-400 mb-2">Effect</h3>
-                <p className="text-gray-300 text-sm leading-relaxed">
-                  {selectedItem.effect_entries.find(e => e.short_effect)?.short_effect ||
-                   selectedItem.effect_entries[0]?.effect ||
-                   'No description available.'}
-                </p>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
+  
     </div>
   )
 }

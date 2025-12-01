@@ -40,7 +40,7 @@ function PokemonCard({ pokemon, onClick }: PokemonCardProps) {
           {pokemon.types.map((t) => (
             <span
               key={t.type.name}
-              className="px-3 py-1 rounded-full text-xs font-semibold text-white capitalize"
+              className="px-3 py-1 rounded text-xs font-semibold text-white capitalize"
               style={{ backgroundColor: TYPE_COLORS[t.type.name] || TYPE_COLORS.normal }}
             >
               {t.type.name}

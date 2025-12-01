@@ -34,8 +34,9 @@ function PokemonModal({ pokemon, onClose }: PokemonModalProps) {
       >
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 z-20 w-8 h-8 rounded-full bg-black/20 text-white flex items-center justify-center hover:bg-black/40 transition-colors"
+          className="absolute top-4 right-4 z-20 w-8 h-8 rounded bg-black/20 text-white flex items-center justify-center hover:bg-black/40 transition-colors"
         >
+          ✕
         </button>
 
         <div className="relative p-6 pb-24">
@@ -92,9 +93,9 @@ function PokemonModal({ pokemon, onClose }: PokemonModalProps) {
                 <span className="text-white font-semibold w-10 text-right">
                   {stat.base_stat}
                 </span>
-                <div className="flex-1 h-2 bg-slate-700 rounded-full overflow-hidden">
+                <div className="flex-1 h-2 bg-slate-700 rounded overflow-hidden">
                   <div
-                    className="h-full rounded-full transition-all duration-500"
+                    className="h-full rounded transition-all duration-500"
                     style={{
                       width: `${(stat.base_stat / MAX_STAT) * 100}%`,
                       backgroundColor: bgColor,

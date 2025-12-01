@@ -62,6 +62,7 @@ export interface Move {
   accuracy: number | null
   pp: number | null
   effect_entries: { effect: string; short_effect: string }[]
+  learned_by_pokemon: { name: string; url: string }[]
 }
 
 export interface MoveListResponse {
