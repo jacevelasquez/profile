@@ -54,7 +54,7 @@ function Introduction() {
             <img 
               src={`${BASE_URL}avatar.png`} 
               alt="JC Velasquez" 
-              className="w-80 h-80 rounded-full object-cover relative z-10 border-4 border-white/10"
+              className="w-96 h-96 rounded-full object-cover relative z-10 border-4 border-white/10"
             />
           </div>
         </div>

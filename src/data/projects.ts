@@ -1,19 +1,27 @@
-export const projects = [
+export interface Project {
+  title: string
+  slug: string
+  icon: string | null
+  desc: string
+  disabled?: boolean
+}
+
+export const projects: Project[] = [
   {
     title: "Pokemon API Database",
-    link: "#",
+    slug: "pokemon-database",
     icon: "/pokeball.png",
-    desc: "Pokemon Database using PokeAPI",
+    desc: "Browse and explore 1000+ Pokémon with stats, abilities & evolutions powered by PokeAPI",
   },
   {
     title: "Monster Hunter Database",
-    link: "#",
+    slug: "monster-hunter-database",
     icon: "/mh.webp",
-    desc: "Monster Hunter Wilds database using mhdb.io",
+    desc: "Your ultimate companion for Monster Hunter Wilds — monsters, weapons, armor & more",
   },
   {
     title: "Coming Soon",
-    link: "#",
+    slug: "coming-soon",
     icon: null,
     disabled: true,
     desc: "",
