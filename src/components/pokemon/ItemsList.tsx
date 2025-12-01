@@ -16,7 +16,6 @@ function ItemsList() {
   const [hasMoreCategory, setHasMoreCategory] = useState(true)
   const [totalCount, setTotalCount] = useState(0)
   const [categoryCount, setCategoryCount] = useState(0)
-  const [selectedItem, setSelectedItem] = useState<Item | null>(null)
   const allItemsList = useRef<{ name: string; url: string }[]>([])
   const categoryItemUrls = useRef<string[]>([])
   const baseCategoryItems = useRef<Item[]>([])
@@ -249,7 +248,6 @@ function ItemsList() {
             {filteredItems.map((item) => (
               <div
                 key={item.id}
-                onClick={() => setSelectedItem(item)}
                 className="grid grid-cols-[20%_20%_60%] gap-2 px-4 py-1 cursor-pointer hover:bg-slate-800 transition-colors border-t border-slate-800 items-center"
               >
                 <div className="flex flex-row items-center gap-2">
