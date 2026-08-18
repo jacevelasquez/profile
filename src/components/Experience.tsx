@@ -1,38 +1,36 @@
 import { experiences } from '../data/experiences'
+import Section from './Section'
 
 function Experience() {
   return (
-    <section id="experience" className="min-h-screen p-8 bg-slate-950">
-      <div className="max-w-4xl mx-auto">
-        <h2 className="text-4xl font-bold text-slate-400 mb-8">Professional Experience</h2>
-        <div className="space-y-8">
-          {experiences.map((exp, index) => (
-            <div key={index} className="border-l-2 border-slate-600 pl-6">
-              <h3 className="text-xl font-bold text-white">{exp.company}</h3>
-              <p className="text-slate-400 font-medium">{exp.role}</p>
-              <p className="text-gray-400 text-sm mb-2">{exp.period}</p>
-              
-              {exp.previousRoles && (
-                <div className="mb-2 text-sm text-gray-400">
-                  {exp.previousRoles.map((prev, i) => (
-                    <p key={i}>{prev.role} | {prev.period}</p>
-                  ))}
-                </div>
-              )}
-              
-              <ul className="space-y-2 mt-3">
-                {exp.points.map((point, i) => (
-                  <li key={i} className="flex items-start gap-2 text-gray-300">
-                    <span className="text-slate-400">•</span>
-                    <span>{point}</span>
-                  </li>
+    <Section id="experience" eyebrow="Where I've been" title="Professional Experience">
+      <div className="space-y-10">
+        {experiences.map((exp, index) => (
+          <div key={index} className="border-l-2 border-slate-800 pl-5">
+            <h3 className="text-base font-bold text-white">{exp.company}</h3>
+            <p className="text-indigo-400 text-sm font-medium">{exp.role}</p>
+            <p className="text-gray-500 text-xs mb-2">{exp.period}</p>
+
+            {exp.previousRoles && (
+              <div className="mb-2 text-xs text-gray-500">
+                {exp.previousRoles.map((prev, i) => (
+                  <p key={i}>{prev.role} | {prev.period}</p>
                 ))}
-              </ul>
-            </div>
-          ))}
-        </div>
+              </div>
+            )}
+
+            <ul className="space-y-1.5 mt-3">
+              {exp.points.map((point, i) => (
+                <li key={i} className="flex items-start gap-2 text-gray-400 text-sm">
+                  <span className="mt-2 w-1 h-1 rounded-full bg-slate-600 shrink-0" />
+                  <span>{point}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
       </div>
-    </section>
+    </Section>
   )
 }
 

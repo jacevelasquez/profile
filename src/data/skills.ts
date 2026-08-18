@@ -21,6 +21,8 @@ export const skills: SkillCategory[] = [
     category: "Frontend",
     items: [
       { name: "React", logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg" },
+      { name: "Next.js", logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nextjs/nextjs-original.svg" },
+      { name: "Angular", logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/angularjs/angularjs-original.svg" },
       { name: "React Native", logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg" },
       { name: "Expo", logo: "https://www.vectorlogo.zone/logos/expoio/expoio-icon.svg" },
     ],
@@ -38,6 +40,7 @@ export const skills: SkillCategory[] = [
     items: [
       { name: "Node.js", logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg" },
       { name: "Express", logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/express/express-original.svg" },
+      { name: "GraphQL", logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/graphql/graphql-plain.svg" },
       { name: "REST APIs" },
     ],
   },
@@ -51,6 +54,8 @@ export const skills: SkillCategory[] = [
       { name: "DynamoDB", logo: "https://icon.icepanel.io/AWS/svg/Database/DynamoDB.svg" },
       { name: "CloudFront", logo: "https://icon.icepanel.io/AWS/svg/Networking-Content-Delivery/CloudFront.svg" },
       { name: "API Gateway", logo: "https://icon.icepanel.io/AWS/svg/App-Integration/API-Gateway.svg" },
+      { name: "Step Functions", logo: "https://icon.icepanel.io/AWS/svg/App-Integration/Step-Functions.svg" },
+      { name: "Systems Manager", logo: "https://icon.icepanel.io/AWS/svg/Management-Governance/Systems-Manager.svg" },
       { name: "IAM", logo: "https://icon.icepanel.io/AWS/svg/Security-Identity-Compliance/IAM-Identity-Center.svg" },
       { name: "Route 53", logo: "https://icon.icepanel.io/AWS/svg/Networking-Content-Delivery/Route-53.svg" },
       { name: "Secrets Manager", logo: "https://icon.icepanel.io/AWS/svg/Security-Identity-Compliance/Secrets-Manager.svg" },
@@ -73,15 +78,34 @@ export const skills: SkillCategory[] = [
       { name: "MongoDB", logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mongodb/mongodb-original.svg" },
       { name: "DynamoDB", logo: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/dynamodb/dynamodb-original.svg" },
       { name: "SQLite", logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/sqlite/sqlite-original.svg" },
+      { name: "Redis", logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/redis/redis-original.svg" },
+    ],
+  },
+  {
+    category: "Platforms & Observability",
+    items: [
+      { name: "Contentful CMS", logo: "https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/contentful.svg" },
+      { name: "Datadog", logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/datadog/datadog-original.svg" },
     ],
   },
   {
     category: "Tools",
     items: [
       { name: "Git", logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg" },
+      { name: "GitHub", logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg" },
       { name: "Azure DevOps", logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/azure/azure-original.svg" },
+      { name: "Jenkins", logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/jenkins/jenkins-original.svg" },
       { name: "Jest", logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/jest/jest-plain.svg" },
       { name: "Postman", logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postman/postman-original.svg" },
+    ],
+  },
+  {
+    category: "Leadership & Process",
+    items: [
+      { name: "Team Leadership & Mentoring" },
+      { name: "Scrum Master / Agile-Scrum" },
+      { name: "Architecture & Technical Planning" },
+      { name: "Code Review & Delivery Ownership" },
     ],
   },
 ]

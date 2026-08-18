@@ -1,41 +1,48 @@
 import { projects } from '../data/projects'
+import Section from './Section'
 
 const BASE_URL = import.meta.env.BASE_URL
 
 function Projects() {
   return (
-    <section id="projects" className="min-h-screen p-8 bg-slate-900">
-      <div className="max-w-4xl mx-auto">
-        <h2 className="text-4xl font-bold text-slate-400 mb-8">Personal Projects</h2>
-        <div className="grid md:grid-cols-3 gap-6">
-          {projects.map((project, index) => (
-            <a
+    <Section id="projects" eyebrow="On the side" title="Personal Projects" wide>
+      <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
+        {projects.map((project, index) => {
+          const clickable = !project.disabled && !!project.link
+          const Wrapper = clickable ? 'a' : 'div'
+          return (
+            <Wrapper
               key={index}
-              href={project.disabled ? undefined : project.link}
-              className={`p-6 rounded-xl text-center transition-all ${
+              {...(clickable ? { href: project.link! } : {})}
+              className={`p-6 rounded-xl border text-center transition-colors ${
                 project.disabled
-                  ? "bg-slate-800/50 text-gray-500 cursor-not-allowed"
-                  : "bg-slate-800 hover:bg-slate-700 text-white cursor-pointer"
+                  ? "border-slate-800/60 text-gray-600 cursor-not-allowed"
+                  : clickable
+                  ? "border-slate-800 hover:border-slate-600 text-white cursor-pointer"
+                  : "border-slate-800 text-white"
               }`}
             >
               {project.icon ? (
-                <img 
-                  src={BASE_URL+project.icon} 
-                  alt={project.title} 
-                  className="w-64 h-64 mx-auto mb-4 rounded-lg object-contain"
+                <img
+                  src={BASE_URL + project.icon}
+                  alt={project.title}
+                  className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4 rounded-lg object-contain opacity-90"
                 />
               ) : (
-                <div className="w-32 h-32 mx-auto mb-4 rounded-lg border-2 border-dashed border-gray-500 flex items-center justify-center">
-                  <span className="text-4xl">?</span>
+                <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4 rounded-lg border-2 border-dashed border-slate-700 flex items-center justify-center">
+                  <span className="text-2xl text-slate-600">?</span>
                 </div>
               )}
-              <h3 className="text-xl font-bold">{project.title}</h3>
-              <span className="text-sm">{project.desc}</span>
-            </a>
-          ))}
-        </div>
+              <h3 className="text-sm sm:text-base font-bold">{project.title}</h3>
+              <span className="text-xs sm:text-sm text-gray-500">{project.desc}</span>
+              {!project.disabled && !project.link && (
+                <p className="text-xs text-gray-600 mt-1">Link coming soon</p>
+              )}
+            </Wrapper>
+          )
+        })}
       </div>
-    </section>
+    </Section>
   )
 }
 

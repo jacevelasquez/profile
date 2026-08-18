@@ -2,6 +2,7 @@ import Navbar from './components/Navbar'
 import Introduction from './components/Introduction'
 import Skills from './components/Skills'
 import Experience from './components/Experience'
+import Credentials from './components/Credentials'
 import Projects from './components/Projects'
 import Contact from './components/Contact'
 import Footer from './components/Footer'
@@ -13,6 +14,7 @@ function App() {
       <Introduction />
       <Skills />
       <Experience />
+      <Credentials />
       <Projects />
       <Contact />
       <Footer />
