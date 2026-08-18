@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { projects } from '../data/projects'
 import Section from './Section'
 
@@ -8,20 +9,14 @@ function Projects() {
     <Section id="projects" eyebrow="On the side" title="Personal Projects" wide>
       <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
         {projects.map((project, index) => {
-          const clickable = !project.disabled && !!project.link
-          const Wrapper = clickable ? 'a' : 'div'
-          return (
-            <Wrapper
-              key={index}
-              {...(clickable ? { href: project.link! } : {})}
-              className={`p-6 rounded-xl border text-center transition-colors ${
-                project.disabled
-                  ? "border-slate-800/60 text-gray-600 cursor-not-allowed"
-                  : clickable
-                  ? "border-slate-800 hover:border-slate-600 text-white cursor-pointer"
-                  : "border-slate-800 text-white"
-              }`}
-            >
+          const cardClass = `p-6 rounded-xl border text-center transition-colors ${
+            project.disabled
+              ? "border-slate-800/60 text-gray-600 cursor-not-allowed"
+              : "border-slate-800 hover:border-slate-600 text-white cursor-pointer"
+          }`
+
+          const cardContent = (
+            <>
               {project.icon ? (
                 <img
                   src={BASE_URL + project.icon}
@@ -35,10 +30,21 @@ function Projects() {
               )}
               <h3 className="text-sm sm:text-base font-bold">{project.title}</h3>
               <span className="text-xs sm:text-sm text-gray-500">{project.desc}</span>
-              {!project.disabled && !project.link && (
-                <p className="text-xs text-gray-600 mt-1">Link coming soon</p>
-              )}
-            </Wrapper>
+            </>
+          )
+
+          if (project.disabled) {
+            return (
+              <div key={index} className={cardClass}>
+                {cardContent}
+              </div>
+            )
+          }
+
+          return (
+            <Link key={index} to={`/projects/${project.slug}`} className={cardClass}>
+              {cardContent}
+            </Link>
           )
         })}
       </div>
